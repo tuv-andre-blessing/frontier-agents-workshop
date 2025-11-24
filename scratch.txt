@@ -1,0 +1,3 @@
+https://github.com/warnov/ms-agent-framework-step-by-step-workshop/blob/main/09-agents-middleware/app.py
+
+https://github.com/microsoft/agentic-ai-lab/blob/main/chat-rag/3-basic-rag.ipynb

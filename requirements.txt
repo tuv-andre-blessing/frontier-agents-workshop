@@ -1,0 +1,10 @@
+# Microsoft Agent Framework
+agent-framework
+# Requirements File
+fastapi==0.121.3
+fastmcp==2.13.1
+pydantic==2.12.4
+python-dotenv==1.2.1
+pytz==2025.2
+uvicorn==0.38.0
+openai==2.8.1
