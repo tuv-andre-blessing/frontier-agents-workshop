@@ -28,12 +28,10 @@ Shows function calling capabilities with custom business logic.
 if (os.environ.get("GITHUB_TOKEN") is not None):
     token = os.environ["GITHUB_TOKEN"]
     endpoint = "https://models.github.ai/inference"
-    model_name = f"openai/gpt-5-nano"
     print("Using GitHub Token for authentication")
 elif (os.environ.get("AZURE_OPENAI_API_KEY") is not None):
     token = os.environ["AZURE_OPENAI_API_KEY"]
     endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
-    model_name = os.environ["COMPLETION_DEPLOYMENT_NAME"]
     print("Using Azure OpenAI Token for authentication")
 
 async_openai_client = AsyncOpenAI(
@@ -41,8 +39,24 @@ async_openai_client = AsyncOpenAI(
     api_key=token
 )
 
-openai_client=OpenAIChatClient(
-    model_id = model_name,
+completion_model_name = os.environ.get("COMPLETION_DEPLOYMENT_NAME")
+medium_model_name = os.environ.get("MEDIUM_DEPLOYMENT_MODEL_NAME")
+small_model_name = os.environ.get("SMALL_DEPLOYMENT_MODEL_NAME")
+
+completion_client=OpenAIChatClient(
+    model_id = completion_model_name,
+    api_key=token,
+    async_client = async_openai_client
+)
+
+medium_client=OpenAIChatClient(
+    model_id = medium_model_name,
+    api_key=token,
+    async_client = async_openai_client
+)
+
+small_client=OpenAIChatClient(
+    model_id = small_model_name,
     api_key=token,
     async_client = async_openai_client
 )
@@ -121,7 +135,7 @@ async def main() -> None:
             return get_hackernews_story(*args, **kwargs)
 
     agent = ChatAgent(
-        chat_client=openai_client,
+        chat_client=medium_client,
         instructions=(
             "You are a helpful news assistant that uses the provided tools "
             "to fetch and summarize Hacker News stories. When asked about "

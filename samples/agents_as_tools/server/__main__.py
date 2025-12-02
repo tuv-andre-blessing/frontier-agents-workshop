@@ -15,6 +15,17 @@ from dotenv import load_dotenv
 from fastmcp import FastMCP
 
 from samples.agents_as_tools.server.weather_agent import WeatherAgent
+from samples.agents_as_tools.server.news_agent import NewsAgent
+
+from agent_framework import (
+    AgentRunResponse,
+    AgentRunResponseUpdate,
+    AgentThread,
+    BaseAgent,
+    ChatMessage,
+    Role,
+    TextContent,
+)
 
 logging.basicConfig(
     level=logging.WARNING,
@@ -32,7 +43,7 @@ load_dotenv()
 class AgentInfo:
     """Simple container for locally-available agents."""
 
-    def __init__(self, agent_id: str, name: str, description: str, agent: WeatherAgent):
+    def __init__(self, agent_id: str, name: str, description: str, agent: BaseAgent):
         self.id = agent_id
         self.name = name
         self.description = description
@@ -65,7 +76,19 @@ def initialize_agents() -> None:
         agent=weather_agent,
     )
 
-    DEFAULT_AGENT_ID = agent_id
+    news_agent = NewsAgent(
+        name="NewsBot",
+        description="An agent that can fetch and summarize Hacker News stories",
+    )
+    agent_id = "news-agent"
+    SUPPORTED_AGENTS[agent_id] = AgentInfo(
+        agent_id=agent_id,
+        name=news_agent.display_name,
+        description=news_agent.description or "News agent",
+        agent=news_agent,
+    )
+
+    DEFAULT_AGENT_ID = "weather-agent"
 
 
 initialize_agents()

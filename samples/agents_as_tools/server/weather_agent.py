@@ -33,28 +33,40 @@ load_dotenv()
 
 logger = logging.getLogger("weather_agent")
 
-if os.environ.get("GITHUB_TOKEN") is not None:
+if (os.environ.get("GITHUB_TOKEN") is not None):
     token = os.environ["GITHUB_TOKEN"]
     endpoint = "https://models.github.ai/inference"
-    model_name = "openai/gpt-5-nano"
     print("Using GitHub Token for authentication")
-elif os.environ.get("AZURE_OPENAI_API_KEY") is not None:
+elif (os.environ.get("AZURE_OPENAI_API_KEY") is not None):
     token = os.environ["AZURE_OPENAI_API_KEY"]
     endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
-    model_name = os.environ["COMPLETION_DEPLOYMENT_NAME"]
     print("Using Azure OpenAI Token for authentication")
-else:
-    raise RuntimeError("No GITHUB_TOKEN or AZURE_OPENAI_API_KEY configured")
 
 async_openai_client = AsyncOpenAI(
     base_url=endpoint,
-    api_key=token,
+    api_key=token
 )
 
-openai_client = OpenAIChatClient(
-    model_id=model_name,
+completion_model_name = os.environ.get("COMPLETION_DEPLOYMENT_NAME")
+medium_model_name = os.environ.get("MEDIUM_DEPLOYMENT_MODEL_NAME")
+small_model_name = os.environ.get("SMALL_DEPLOYMENT_MODEL_NAME")
+
+completion_client=OpenAIChatClient(
+    model_id = completion_model_name,
     api_key=token,
-    async_client=async_openai_client,
+    async_client = async_openai_client
+)
+
+medium_client=OpenAIChatClient(
+    model_id = medium_model_name,
+    api_key=token,
+    async_client = async_openai_client
+)
+
+small_client=OpenAIChatClient(
+    model_id = small_model_name,
+    api_key=token,
+    async_client = async_openai_client
 )
 
 
@@ -127,7 +139,7 @@ class WeatherAgent(BaseAgent):
         logger.info("WeatherAgent handling query", extra={"agent_id": self.id, "user_text": user_text})
 
         # Delegate reply generation to the OpenAI client using the weather tool
-        response = await openai_client.get_response(user_text, tools=get_weather)
+        response = await small_client.get_response(user_text, tools=get_weather)
         reply_text = str(response)
 
         logger.info(
@@ -165,7 +177,7 @@ class WeatherAgent(BaseAgent):
 
         full_text_chunks: list[str] = []
 
-        async for chunk in openai_client.get_streaming_response(user_text, tools=get_weather):
+        async for chunk in small_client.get_streaming_response(user_text, tools=get_weather):
             if chunk.text:
                 full_text_chunks.append(chunk.text)
                 logger.debug(

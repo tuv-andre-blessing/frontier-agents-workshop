@@ -21,6 +21,9 @@ Join us for an immersive hands-on lab focused on Microsoft Agent Framework, wher
 
 ## Learning Goals for this workshop
 
+This workshop is about learning to work with the Microsoft Agent Framwork - independently of AI Foundry.
+![story](./story.png)
+
 ### 🛠 Agent Authoring
 Learning to use the *Microsoft Agent Framework* SDK for code-based and declarative agent development.
 
